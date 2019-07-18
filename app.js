@@ -8,16 +8,24 @@
 //Game values
 let min = 1,
   max = 10,
-  winningNum = 2,
+  winningNum = getRandomNum(min, max),
   guessesLeft = 3;
 
 //UI Elements
-const game = document.getElementById("#game"),
+const game = document.querySelector("#game"),
   minNum = document.querySelector(".min-num"),
   maxNum = document.querySelector(".max-num"),
   guessBtn = document.querySelector("#guess-btn"),
   guessInput = document.querySelector("#guess-input"),
   message = document.querySelector(".message");
+
+//Play again event listener
+game.addEventListener("mousedown", function(e) {
+  console.log(1);
+  if (e.target.className === "play-again") {
+    window.location.reload();
+  }
+});
 
 //Assign UI min and max
 minNum.textContent = min;
@@ -33,17 +41,42 @@ guessBtn.addEventListener("click", function() {
   //Check if won
   if (guess === winningNum) {
     //Disable input
-    guessInput.disabled = true;
-    //Change border color
-    guessInput.style.borderColor = "green";
-    //set message
-    setMessage(
-      "CONGRATULATIONS. Worked so hard, forgot how to vacation. They ain't never had the dedication. People hatin', say we changed and look we made it. Yeah, we made it",
-      "green"
-    );
+    gameOver(true, "You won!");
   } else {
+    guessesLeft -= 1;
+    if (guessesLeft === 0) {
+      //Game over
+      gameOver(false, `You lost! Correct number is ${winningNum}`);
+    } else {
+      //Game continues
+      guessInput.style.borderColor = "red";
+
+      guessInput.value = "";
+      setMessage(`${guess} is not correct, ${guessesLeft} guesses left`, "Red");
+    }
   }
 });
+
+//Game over
+function gameOver(won, msg) {
+  let color;
+  won === true ? (color = "green") : (color = "red");
+  guessInput.disabled = true;
+  //Change border color
+  guessInput.style.borderColor = color;
+  //set text color
+  message.style.color = color;
+  //set message
+  setMessage(msg);
+  //Play again?
+  guessBtn.value = "Play Again";
+  guessBtn.className += "play-again";
+}
+
+//random num gen
+function getRandomNum(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
 
 //set message
 function setMessage(msg, color) {
